@@ -1,41 +1,23 @@
-def add(x, y):
-    return x + y
+from flask import Flask, render_template, request, jsonify
 
-def subtract(x, y):
-    return x - y
+app = Flask(__name__)
 
-def multiply(x, y):
-    return x * y
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-def divide(x, y):
-    if y == 0:
-        return "Error! Division by zero."
-    return x / y
+@app.route('/calculate', methods=['POST'])
+def calculate():
+    try:
+        data = request.get_json()
+        expression = data.get("expression")
 
-def calculator():
-    print("Select operation:")
-    print("1. Add")
-    print("2. Subtract")
-    print("3. Multiply")
-    print("4. Divide")
-    
-    choice = input("Enter choice (1/2/3/4): ")
-    
-    if choice in ('1', '2', '3', '4'):
-        num1 = float(input("Enter first number: "))
-        num2 = float(input("Enter second number: "))
-        
-        if choice == '1':
-            print(f"Result: {add(num1, num2)}")
-        elif choice == '2':
-            print(f"Result: {subtract(num1, num2)}")
-        elif choice == '3':
-            print(f"Result: {multiply(num1, num2)}")
-        elif choice == '4':
-            print(f"Result: {divide(num1, num2)}")
-    else:
-        print("Invalid input")
+        # Safe evaluation using eval with restricted globals
+        result = eval(expression, {"__builtins__": None}, {})
 
-if __name__ == "__main__":
-    calculator()
+        return jsonify({"result": result})
+    except Exception:
+        return jsonify({"result": "Invalid Expression"}), 400
 
+if __name__ == '__main__':
+    app.run(debug=True)

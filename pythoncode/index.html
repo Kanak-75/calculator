@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="calculator">
+        <h2>Real Calculator</h2>
+        <form id="calcForm">
+            <input type="text" id="expression" placeholder="Enter a math expression (e.g., 12/4)" required>
+            <button type="submit">Calculate</button>
+        </form>
+        <h3>Result: <span id="result"></span></h3>
+    </div>
+
+    <script>
+        document.getElementById("calcForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let expression = document.getElementById("expression").value;
+
+            fetch("/calculate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ expression: expression })
+            })
+            .then(response => response.json())
+            .then(data => document.getElementById("result").textContent = data.result)
+            .catch(error => console.error("Error:", error));
+        });
+    </script>
+</body>
+</html>
